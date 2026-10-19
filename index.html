@@ -88,10 +88,6 @@ footer{color:var(--muted);font-size:12px;max-width:65ch}
       <span class="lbl">Genre (alla valda måste stämma)</span>
       <div class="chips" id="genres"></div>
     </div>
-    <div>
-      <span class="lbl">Dölj</span>
-      <div class="chips" id="hides"></div>
-    </div>
     <div class="row">
       <div><label class="lbl" for="q">Sök titel eller namn</label>
         <input type="search" id="q" placeholder="t.ex. Tom Hanks" autocomplete="off"></div>
@@ -143,9 +139,6 @@ const gEl=$("genres");
 Object.entries(GEN).forEach(([k,name])=>{const b=document.createElement("button");b.type="button";b.className="chip"+(k==="J"?" jul":"");
   b.textContent=name;b.setAttribute("aria-pressed","false");b.dataset.k=k;
   b.onclick=()=>{S.genres.has(k)?S.genres.delete(k):S.genres.add(k);b.setAttribute("aria-pressed",S.genres.has(k));S.shown=20;update();};gEl.append(b);});
-const hEl=$("hides");
-HIDE.forEach(([k,name])=>{const b=document.createElement("button");b.type="button";b.className="chip hide";b.textContent="Ej "+name.toLowerCase();b.setAttribute("aria-pressed","false");b.dataset.k=k;
-  b.onclick=()=>{S.hide.has(k)?S.hide.delete(k):S.hide.add(k);b.setAttribute("aria-pressed",S.hide.has(k));S.shown=20;update();};hEl.append(b);});
 $("typ").querySelectorAll("button").forEach(b=>b.onclick=()=>{S.typ=b.dataset.v;$("typ").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));S.shown=20;update();});
 ["q","from","to","lang","sort"].forEach(id=>$(id).addEventListener("input",()=>{S.shown=20;update();}));
 $("more").onclick=()=>{S.shown+=20;update();};
