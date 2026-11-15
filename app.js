@@ -97,7 +97,7 @@ function readCatalog(data){
 }
 function validate(data){
   if(data?.schema!==2 || typeof data.datum!=="string" || !Array.isArray(data.rows) || !data.rows.length)
-    throw Error("Välj en giltig katalog.json för Filmtips.");
+    throw Error("Ogiltigt katalogformat.");
   const ids=new Set();
   for(const r of data.rows){
     const strings=[0,3,4,5,8,9,10,11];
@@ -140,7 +140,6 @@ async function stored(data){
   } finally {db.close();}
 }
 async function startup(){
-  $("import").disabled=true;
   try{
     const prior=await stored();
     if(prior)showCatalog(readCatalog(prior));
@@ -159,23 +158,12 @@ async function startup(){
       $("notice").textContent="Katalogen är öppen. Den kunde inte sparas för offlinebruk.";
     }
   }catch{
-    $("notice").textContent=items.length?"Visar den sparade katalogen.":"Välj Läs in katalog för att öppna katalog.json.";
+    $("notice").textContent=items.length?"Visar den sparade katalogen.":"Katalogen kunde inte hämtas. Öppna appen igen när du har internet.";
   }finally{
     clearTimeout(timeout);
-    $("import").disabled=false;
   }
 }
-$("import").onclick=()=>$("file").click();
-$("file").onchange=async event=>{
-  const file=event.target.files[0];if(!file)return;
-  $("import").disabled=true;
-  try{
-    const data=readCatalog(JSON.parse(await file.text()));
-    await stored(data);showCatalog(data);
-    $("notice").textContent="Katalogen är sparad på den här enheten.";
-  }catch(error){$("notice").textContent="Importen misslyckades. Kontrollera filen och ledigt lagringsutrymme.";}
-  finally{$("file").value="";$("import").disabled=false;}
-};
+
 startup();
 if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{
   const message=document.createElement("p");message.textContent="Offlineläget kunde inte aktiveras.";document.querySelector("footer").append(message);
