@@ -1,4 +1,4 @@
-const GEN={J:"Jul",D:"Drama",K:"Komedi",T:"Thriller",A:"Action",V:"Äventyr",F:"Sci-fi",Y:"Fantasy",S:"Skräck",R:"Romantik",C:"Kriminal",Q:"Mysterium",N:"Animerat",B:"Familj",H:"Historiskt",W:"Krig",M:"Musik/musikal",E:"Western",O:"Dokumentär"};
+const GEN={J:"Christmas",D:"Drama",K:"Comedy",T:"Thriller",A:"Action",V:"Adventure",F:"Sci-fi",Y:"Fantasy",S:"Horror",R:"Romance",C:"Crime",Q:"Mystery",N:"Animation",B:"Family",H:"History",W:"War",M:"Music / Musical",E:"Western",O:"Documentary"};
 const NORDIC=new Set(["sv","da","no","fi"]);
 const KNOWN=new Set(["en","sv","da","no","fi","ko","ja","fr","es","de","it","hi","zh"]);
 const S={typ:"f",genres:new Set(),shown:20};
@@ -23,7 +23,7 @@ function rank(items){
   const mean=items.reduce((sum,it)=>sum+it.imdb,0)/items.length;
   for(const it of items) it.wr=(it.votes*it.imdb+25000*mean)/(it.votes+25000);
 }
-const fmt=n=>n>=1e6?(n/1e6).toLocaleString("sv-SE",{maximumFractionDigits:1})+" milj.":n.toLocaleString("sv-SE");
+const fmt=n=>n>=1e6?(n/1e6).toLocaleString("en-US",{maximumFractionDigits:1})+"M":n.toLocaleString("en-US");
 function filtered(){
   const q=$("q").value.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
   const words=q?q.split(/\s+/):[];
@@ -48,15 +48,15 @@ function card(it,i){
   a.href=it.id?"https://www.imdb.com/title/"+it.id+"/":"https://www.imdb.com/find/?q="+encodeURIComponent(it.t+" "+it.y);a.target="_blank";a.rel="noopener";
   a.textContent=`${it.t} (${it.y})`;h.append(a);
   const m=document.createElement("div");m.className="meta";
-  const bits=[it.sv?"Svenska: "+it.sv:"",it.type==="s"?"Serie":"Film",[...it.g].sort((a,b)=>(b==="J")-(a==="J")).map(k=>GEN[k]).filter(Boolean).slice(0,3).join(", ")];
+  const bits=[[...it.g].sort((a,b)=>(b==="J")-(a==="J")).map(k=>GEN[k]).filter(Boolean).slice(0,3).join(", ")];
   if(it.by)bits.push(it.by);if(it.cast.length){let shown=it.cast.slice(0,3);
     if(QW.length)for(const c of it.cast.slice(3)){const cl=c.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");if(QW.some(w=>cl.includes(w)))shown.push(c);}
-    bits.push("Med "+shown.join(", "));}
+    bits.push("Cast: "+shown.join(", "));}
   m.textContent=bits.filter(Boolean).join(" · ");t.append(h,m);
   const s=document.createElement("div");s.className="scores";
   const add=(cls,lab,val)=>{const e=document.createElement("span");e.className="sc "+cls;const l=document.createElement("span");l.textContent=lab;const b=document.createElement("b");b.textContent=val;e.append(l,b);s.append(e);};
-  if(it.imdb!=null)add("imdb","IMDb",it.imdb.toFixed(1).replace(".",","));
-  add("v","Röster",fmt(it.votes));
+  if(it.imdb!=null)add("imdb","IMDb",it.imdb.toFixed(1));
+  add("v","Votes",fmt(it.votes));
   t.append(s);li.append(r,t);return li;
 }
 function update(){
@@ -64,11 +64,11 @@ function update(){
   QW=$("q").value.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").split(/\s+/).filter(Boolean);
   ol.replaceChildren(...res.slice(0,S.shown).map(card));
   if(!res.length){const e=document.createElement("li");e.className="empty";
-    e.textContent=yInvalid()?"Från-året ligger efter till-året.":"Inga titlar matchar. Prova att ändra sökningen eller rensa filtren.";ol.append(e);}
-  const nf=n=>n.toLocaleString("sv-SE");
+    e.textContent=yInvalid()?"The start year is after the end year.":"No matching titles. Try another search or clear the filters.";ol.append(e);}
+  const nf=n=>n.toLocaleString("en-US");
 
-  $("count").textContent=(res.length===1?"1 titel matchar":nf(res.length)+" titlar matchar");
-  $("listTitle").textContent=res.length>20?(S.shown>=res.length?"Alla "+nf(res.length):"Topp "+Math.min(S.shown,res.length)):"Topplista";
+  $("count").textContent=(res.length===1?"1 matching title":nf(res.length)+" matching titles");
+  $("listTitle").textContent=res.length>20?(S.shown>=res.length?"All "+nf(res.length):"Top "+Math.min(S.shown,res.length)):"Top titles";
   $("more").hidden=S.shown>=res.length;
 }
 function yInvalid(){return $("from").value && $("to").value && +$("from").value > +$("to").value;}
@@ -83,11 +83,11 @@ function languageMatches(code, filter){
   }
 }
 const languageLabels = Array.from($("lang").options,o=>[o.value,o.textContent]);
-languageLabels.push(["unknown","Okänt språk"]);
+languageLabels.push(["unknown","Unknown language"]);
 function readCatalog(data){
   if(data?.schema===1 && Array.isArray(data.rows)){
     const rows=data.rows.map(row=>{
-      if(!Array.isArray(row)||row.length!==14)throw Error("Ogiltig katalograd.");
+      if(!Array.isArray(row)||row.length!==14)throw Error("Invalid catalogue row.");
       return [...row.slice(0,7),...row.slice(9)];
     });
     data={schema:2,datum:data.datum,rows};
@@ -97,16 +97,27 @@ function readCatalog(data){
 }
 function validate(data){
   if(data?.schema!==2 || typeof data.datum!=="string" || !Array.isArray(data.rows) || !data.rows.length)
-    throw Error("Ogiltigt katalogformat.");
+    throw Error("Invalid catalogue format.");
   const ids=new Set();
   for(const r of data.rows){
     const strings=[0,3,4,5,8,9,10,11];
     if(!Array.isArray(r)||r.length!==12||!strings.every(i=>typeof r[i]==="string")
       ||!r[0]||!Number.isInteger(r[1])||!["s","f"].includes(r[2])||!/^tt\d+$/.test(r[9])||ids.has(r[9])
       ||!Number.isFinite(r[6])||r[6]<0||r[6]>10||!Number.isInteger(r[7])||r[7]<0)
-      throw Error("Katalogen innehåller en skadad titel.");
+      throw Error("The catalogue contains an invalid title.");
     ids.add(r[9]);
   }
+}
+function catalogueDate(value){
+  const months = {
+    januari:"January", februari:"February", mars:"March", april:"April",
+    maj:"May", juni:"June", juli:"July", augusti:"August",
+    september:"September", oktober:"October", november:"November", december:"December",
+    byggd:"built"
+  };
+  return value.replace(/januari|februari|mars|april|maj|juni|juli|augusti|september|oktober|november|december|byggd/gi,
+    word => months[word.toLowerCase()])
+    .replace("(tidigare katalog)", "(previous catalogue)");
 }
 function showCatalog(data){
   items=prepare(data.rows);
@@ -115,7 +126,7 @@ function showCatalog(data){
   $("lang").replaceChildren(...languageLabels.map(([key,label])=>
     new Option(label+" ("+fmt(items.filter(it=>languageMatches(it.lang,key)).length)+")",key)));
   $("lang").value=filter;
-  $("info").textContent="Katalog "+data.datum+" · "+fmt(items.length)+" titlar.";
+  $("info").textContent="Catalogue "+catalogueDate(data.datum)+" · "+fmt(items.length)+" titles.";
   $("panel").hidden=$("results").hidden=true;
   S.shown=20;update();
   $("panel").hidden=$("results").hidden=false;
@@ -135,7 +146,7 @@ async function stored(data){
       const tx=db.transaction("catalog",data?"readwrite":"readonly"),store=tx.objectStore("catalog");
       const request=data?store.put(data,"active"):store.get("active");
       tx.oncomplete=()=>resolve(request.result);
-      tx.onabort=()=>reject(tx.error||Error("Lagringen avbröts."));
+      tx.onabort=()=>reject(tx.error||Error("Storage was interrupted."));
     });
   } finally {db.close();}
 }
@@ -148,17 +159,17 @@ async function startup(){
   const timeout=setTimeout(()=>controller.abort(),12000);
   try{
     const response=await fetch("./katalog.json",{cache:"no-cache",signal:controller.signal});
-    if(!response.ok)throw Error("Ingen katalog på webbplatsen.");
+    if(!response.ok)throw Error("No catalogue available on the website.");
     const data=readCatalog(await response.json());
     showCatalog(data);
     try{
       await stored(data);
       $("notice").textContent="";
     }catch{
-      $("notice").textContent="Katalogen är öppen. Den kunde inte sparas för offlinebruk.";
+      $("notice").textContent="Catalogue loaded. It could not be saved for offline use.";
     }
   }catch{
-    $("notice").textContent=items.length?"Visar den sparade katalogen.":"Katalogen kunde inte hämtas. Öppna appen igen när du har internet.";
+    $("notice").textContent=items.length?"Showing the saved catalogue.":"Could not load the catalogue. Reopen the app when you are online.";
   }finally{
     clearTimeout(timeout);
   }
@@ -166,5 +177,5 @@ async function startup(){
 
 startup();
 if("serviceWorker" in navigator)navigator.serviceWorker.register("./sw.js").catch(()=>{
-  const message=document.createElement("p");message.textContent="Offlineläget kunde inte aktiveras.";document.querySelector("footer").append(message);
+  const message=document.createElement("p");message.textContent="Offline mode could not be enabled.";document.querySelector("footer").append(message);
 });

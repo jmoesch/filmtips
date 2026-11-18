@@ -1,65 +1,67 @@
 <!doctype html>
-<html lang="sv">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Familjens Filmtips</title>
+<title>Movies and Series</title>
 <link rel="stylesheet" href="app.css">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Movies and Series">
+<meta name="application-name" content="Movies and Series">
 <meta name="theme-color" content="#18202e">
 </head>
 <body>
 
 
 <main class="wrap">
-<header><h1>Familjens <span>filmtips</span></h1></header>
-<div style="display:contents" id="notice" role="status">Öppnar katalogen …</div>
+<header><h1>Movies <span>and Series</span></h1></header>
+<div style="display:contents" id="notice" role="status">Loading catalogue …</div>
 
-  <section hidden id="panel" class="panel" aria-label="Filter">
+  <section hidden id="panel" class="panel" aria-label="Filters">
     <div>
-      <span class="lbl">Typ</span>
+      <span class="lbl">Type</span>
       <div class="seg" id="typ">
-        <button type="button" data-v="f" aria-pressed="true">Filmer</button>
-        <button type="button" data-v="s" aria-pressed="false">Serier</button>
-        <button type="button" data-v="" aria-pressed="false">Båda</button>
+        <button type="button" data-v="f" aria-pressed="true">Movies</button>
+        <button type="button" data-v="s" aria-pressed="false">Series</button>
+        <button type="button" data-v="" aria-pressed="false">Both</button>
       </div>
     </div>
     <div>
-      <span class="lbl">Genre (alla valda måste stämma)</span>
+      <span class="lbl">Genres (match all selected)</span>
       <div class="chips" id="genres"></div>
     </div>
     <div class="row">
-      <div><label class="lbl" for="q">Sök titel eller namn</label>
-        <input type="search" id="q" placeholder="t.ex. Tom Hanks" autocomplete="off"></div>
-      <div><label class="lbl" for="from">Årtal</label>
-        <div class="yr"><select id="from" aria-label="Från år"><option value="">Från: alla år</option><option value="2025">Från 2025</option><option value="2020">Från 2020</option><option value="2015">Från 2015</option><option value="2010">Från 2010</option><option value="2005">Från 2005</option><option value="2000">Från 2000</option><option value="1995">Från 1995</option><option value="1990">Från 1990</option><option value="1980">Från 1980</option><option value="1970">Från 1970</option><option value="1960">Från 1960</option><option value="1950">Från 1950</option></select><select id="to" aria-label="Till år"><option value="">Till: idag</option><option value="2024">Till 2024</option><option value="2019">Till 2019</option><option value="2014">Till 2014</option><option value="2009">Till 2009</option><option value="2004">Till 2004</option><option value="1999">Till 1999</option><option value="1994">Till 1994</option><option value="1989">Till 1989</option><option value="1979">Till 1979</option><option value="1969">Till 1969</option><option value="1959">Till 1959</option></select></div></div>
-      <div><label class="lbl" for="lang">Språk</label>
+      <div><label class="lbl" for="q">Search title or name</label>
+        <input type="search" id="q" placeholder="e.g. Tom Hanks" autocomplete="off"></div>
+      <div><label class="lbl" for="from">Year</label>
+        <div class="yr"><select id="from" aria-label="From year"><option value="">From: any year</option><option value="2025">From 2025</option><option value="2020">From 2020</option><option value="2015">From 2015</option><option value="2010">From 2010</option><option value="2005">From 2005</option><option value="2000">From 2000</option><option value="1995">From 1995</option><option value="1990">From 1990</option><option value="1980">From 1980</option><option value="1970">From 1970</option><option value="1960">From 1960</option><option value="1950">From 1950</option></select><select id="to" aria-label="To year"><option value="">To: any year</option><option value="2024">To 2024</option><option value="2019">To 2019</option><option value="2014">To 2014</option><option value="2009">To 2009</option><option value="2004">To 2004</option><option value="1999">To 1999</option><option value="1994">To 1994</option><option value="1989">To 1989</option><option value="1979">To 1979</option><option value="1969">To 1969</option><option value="1959">To 1959</option></select></div></div>
+      <div><label class="lbl" for="lang">Language</label>
         <select id="lang">
-          <option value="">Alla språk</option><option value="en">Engelska</option><option value="foreign">Ej engelska</option><option value="nordic">Svenska & nordiska</option>
-          <option value="ko">Koreanska</option><option value="ja">Japanska</option><option value="fr">Franska</option>
-          <option value="es">Spanska</option><option value="de">Tyska</option><option value="it">Italienska</option>
-          <option value="hi">Hindi</option><option value="zh">Kinesiska</option><option value="other">Övriga</option>
+          <option value="">All languages</option><option value="en">English</option><option value="foreign">Non-English</option><option value="nordic">Swedish & Nordic</option>
+          <option value="ko">Korean</option><option value="ja">Japanese</option><option value="fr">French</option>
+          <option value="es">Spanish</option><option value="de">German</option><option value="it">Italian</option>
+          <option value="hi">Hindi</option><option value="zh">Chinese</option><option value="other">Other</option>
         </select></div>
-      <div><label class="lbl" for="sort">Sortera efter</label>
+      <div><label class="lbl" for="sort">Sort by</label>
         <select id="sort">
-          <option value="wr">IMDb-betyg (röstviktat)</option><option value="imdb">IMDb-betyg</option>
-          <option value="votes">Mest röster</option><option value="year">Nyast först</option>
+          <option value="wr">IMDb rating (vote-weighted)</option><option value="imdb">IMDb rating</option>
+          <option value="votes">Most votes</option><option value="year">Newest first</option>
         </select></div>
     </div>
     <div class="foot">
       <span class="status" id="count" role="status"></span>
-      <button class="ghost" id="reset" type="button">Rensa filter</button>
+      <button class="ghost" id="reset" type="button">Clear filters</button>
     </div>
   </section>
 
-  <section hidden id="results" aria-label="Resultat">
-    <div class="listhead"><h2 id="listTitle">Topp 20</h2></div>
+  <section hidden id="results" aria-label="Results">
+    <div class="listhead"><h2 id="listTitle">Top 20</h2></div>
     <ol id="list"></ol>
-    <div style="display:grid"><button class="ghost more" id="more" type="button" hidden>Visa 20 till</button></div>
+    <div style="display:grid"><button class="ghost more" id="more" type="button" hidden>Show 20 more</button></div>
   </section>
 
-  <footer><span id="info"></span> Information courtesy of <a href="https://www.imdb.com/">IMDb</a>. Used with permission. · Filmtips 2.1.3</footer>
+  <footer><span id="info"></span> Information courtesy of <a href="https://www.imdb.com/">IMDb</a>. Used with permission. · Movies and Series 2.1.4</footer>
 </main>
 
 <script src="app.js"></script>

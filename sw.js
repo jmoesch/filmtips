@@ -1,5 +1,5 @@
 const prefix="filmtips-"+self.registration.scope+"-";
-const version=prefix+"2.1.3";
+const version=prefix+"2.1.4";
 const files=["./index.html","./app.js","./app.css","./manifest.webmanifest","./apple-touch-icon.png","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(version).then(c=>c.addAll(files.map(f=>new Request(f,{cache:"reload"}))))));
 self.addEventListener("activate",e=>e.waitUntil((async()=>{
